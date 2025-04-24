@@ -26,12 +26,24 @@ if [ ! -d "$TEST_ENV/node_modules" ]; then
     echo "✓ Node.js dependencies installed"
 fi
 
+echo "Building Java middleware..."
+cd "$MW" || exit 1
+
+mvn clean package
+if [ $? -eq 0 ]; then
+    echo "✓ Java dependencies installed and project built"
+else
+    echo "✗ Maven build failed"
+    exit 1
+fi
+cd ..
+
 echo "Setting up MariaDB database..."
 read -s -p "Enter MySQL user password: " MYSQL_PASSWORD
 echo
 
 if [ -n "$MYSQL_PASSWORD" ]; then
-    mariadb -u root -p"$MYSQL_PASSWORD" < "$MW/sql/setup_db.sql"
+    mariadb -u reon -p"$MYSQL_PASSWORD" < "$MW/sql/setup_db.sql"
 else
     mariadb -u root < "$MW/sql/setup_db.sql"
 fi
